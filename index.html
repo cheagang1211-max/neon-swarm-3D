@@ -3196,7 +3196,7 @@ function buildShockShotgun() {
 }
 VM_BUILD = true;
 const VM = {
-  rifle: buildGun({ rl: 0.34, hg: 0.27, barrel: 0.24, mag: 'curved', magY: -0.075, stock: 'fixed', optic: 'acog', furn: G.tan }),
+  rifle: buildGun({ rl: 0.34, hg: 0.27, barrel: 0.24, mag: 'curved', magY: -0.075, stock: 'fixed', optic: 'dot', furn: G.tan }),
   smg: buildGun({ rl: 0.26, hg: 0.14, barrel: 0.12, mag: 'box', magY: -0.06, magZ: -0.11, stock: 'folding', optic: 'dot', furn: G.gray, flash: 0.8 }),
   shotgun: buildGun({ rl: 0.3, hg: 0.2, hgH: 0.05, hgY: -0.03, barrel: 0.36, bore: 0.015, tube: true, pump: true, stock: 'wood', optic: 'iron', rail: false, furn: G.wood, flash: 1.6 }),
   dmr: buildGun({ rl: 0.34, hg: 0.3, barrel: 0.3, brake: true, mag: 'short', magY: -0.065, stock: 'fixed', optic: 'acog', furn: G.olive, flash: 1.2 }),
@@ -3330,9 +3330,9 @@ const zoomFov = z => THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathU
 const ads = (k, z = -0.24) => new V3(0, -VM[k].opticY, z);
 // sHip/sAds: 기본 퍼짐, sMove/sMoveAds: 이동 시 추가 퍼짐 (라디안)
 const WEAPONS = {
-  rifle:   { name: '소총', kind: 'gun', fall: [30, 65, 0.75], price: 0, mag: 30, dmg: 1.6, rate: 0.11, reload: 1.15, zoom: 1.25, scope: true, speed: 1.0, auto: true, kick: 0.006, recoil: 1,
+  rifle:   { name: '소총', kind: 'gun', fall: [30, 65, 0.75], price: 0, mag: 30, dmg: 1.6, rate: 0.11, reload: 1.15, zoom: 1.25, scope: false, speed: 1.0, auto: true, kick: 0.006, recoil: 1,
              sHip: 0.005, sAds: 0.0008, sMove: 0.07, sMoveAds: 0.09, bloom: 0.004, bloomMax: 0.03, snd: 'rifle', hip: new V3(0.2, -0.205, -0.4), ads: ads('rifle'),
-             desc: '기본 지급 돌격소총. 1.25배율 조준경.', specs: ['피해 1.6', '탄창 30발', '1.25배율', '만능형'] },
+             desc: '기본 지급 돌격소총. 1.25배율 도트 조준경 (조준해도 시야가 거의 그대로).', specs: ['피해 1.6', '탄창 30발', '1.25배율', '만능형'] },
   smg:     { name: '기관단총', kind: 'gun', fall: [12, 32, 0.55], price: 10, mag: 32, dmg: 1.15, rate: 0.065, reload: 1.0, zoom: 1.5, scope: false, speed: 1.1, auto: true, kick: 0.004, recoil: 0.7,
              sHip: 0.009, sAds: 0.003, sMove: 0.03, sMoveAds: 0.04, bloom: 0.003, bloomMax: 0.025, snd: 'smg', hip: new V3(0.19, -0.2, -0.36), ads: ads('smg', -0.26),
              desc: '연사가 매우 빠르고 이동 중에도 잘 맞습니다. 근거리용.', specs: ['피해 1.15', '탄창 32발', '근거리 특화 (12m부터 약해짐)', '이동 속도 +10%'] },
