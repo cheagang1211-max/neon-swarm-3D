@@ -3057,7 +3057,11 @@ function buildKnife() {
   gp(BX(0.052, 0.062, 0.09), G.glove, 0.002, -0.008, 0.06, k);
   gp(BX(0.02, 0.022, 0.05), G.glove, -0.024, 0.016, 0.03, k, 0, 0, 0.3);
   k.rotation.set(0.72, -0.22, -0.35); // 칼끝이 위·오른쪽 앞을 향하게 들고 있음
-  return { g: root, arm, wrist, k };
+  // 왼손: 내려베기 때 손잡이 아래쪽을 함께 잡음 (평소엔 숨김)
+  const lh = new THREE.Group(); k.add(lh); lh.visible = false;
+  gp(BX(0.054, 0.064, 0.085), G.glove, -0.002, -0.008, 0.155, lh); gp(BX(0.02, 0.022, 0.05), G.glove, 0.024, 0.016, 0.13, lh, 0, 0, -0.3);
+  limb(new V3(-0.01, -0.03, 0.17), new V3(-0.09, -0.3, 0.36), 0.044, G.sleeve, lh);
+  return { g: root, arm, wrist, k, lh };
 }
 function buildGrenade() {
   const g = new THREE.Group(), h = new THREE.Group(); g.add(h);
@@ -3370,7 +3374,7 @@ const WEAPONS = {
              sHip: 0.05, sAds: 0, sMove: 0.08, sMoveAds: 0.12, snd: 'sniper', hip: new V3(0.2, -0.2, -0.42), ads: new V3(0, -0.085, -0.22),
              desc: '볼트액션. 멈춘 상태로 조준하면 탄이 전혀 퍼지지 않습니다.', specs: ['피해 14 (약점 28)', '탄창 5발', '4배율'] },
   knife:   { name: '장검', kind: 'melee', price: 0, speed: 1.05, hip: KNIFE_SHOULDER,
-             desc: '기본 지급 장검. 넓게 베고, 우클릭으로 겨눈 곳을 정확히 찌릅니다.', specs: ['베기 4', '찌르기 9', '사거리 3.6m'] },
+             desc: '기본 지급 장검. 넓게 베고, 우클릭은 두 손으로 잡아 머리 위에서 내려베어 앞쪽 일직선의 적 2명까지 크게 벱니다.', specs: ['베기 4', '내려베기 10 (2명)', '사거리 3.6m'] },
   katana:  { name: '카타나', kind: 'melee', price: 10, speed: 1.1, hip: KNIFE_SHOULDER,
              desc: '빠른 베기. 우클릭을 누르고 있으면 막기 자세 — 앞에서 날아오는 적 탄을 조준점 방향으로 튕겨내 적에게 되돌려 줍니다. 베는 순간에도 튕겨낼 수 있습니다.', specs: ['베기 3.6', '사거리 3.2m', '튕긴 탄 피해 8+', '막기 중 이동 70%'] },
   hammer:  { name: '망치', kind: 'melee', price: 10, speed: 0.72, hip: new V3(0.3, -0.5, 0.14),
@@ -4889,7 +4893,7 @@ function knifeHit(heavy) {
 // ================= 근접무기 공통 =================
 // MEL[k]: slash(좌클릭) 속도·피해·사거리 / heavy(우클릭) 종류: stab(찌르기)·guard(막기·튕겨내기)·smash(내려찍기)·slam(바닥 강타)·throw(던지기)
 const MEL = {
-  knife:  { rest: [0.72, -0.22, -0.35], slashDur: 0.56, slashCd: 0.6, slashDmg: 4, range: 3.6, cone: 1.0, back: 2, sweep: 5, heavy: 'stab', heavyDur: 0.82, heavyCd: 1.05, heavyDmg: 9 },
+  knife:  { rest: [0.72, -0.22, -0.35], slashDur: 0.56, slashCd: 0.6, slashDmg: 4, range: 3.6, cone: 1.0, back: 2, sweep: 5, heavy: 'smash', heavyDur: 0.88, heavyCd: 1.05, heavyDmg: 10, heavyRange: 3.8, heavyCone: 0.5, heavyMax: 2, armor: 1.2, hitAt: 0.55 },
   katana: { rest: [0.62, -0.3, -0.55], slashDur: 0.38, slashCd: 0.42, slashDmg: 3.6, range: 3.2, cone: 1.05, back: 2, sweep: 4.5, heavy: 'guard' },
   hammer: { rest: [0.62, -0.32, -0.42], slashDur: 1.12, slashCd: 1.2, anim: 'hswing', hitAt: 0.53, range: 3.4, cone: 1.25, max: 99, kill: true, bossDmg: 45, knock: 12, heavy: 'slam', heavyDur: 1.3, heavyCd: 1.85, slamR: 3.2 },
   mace:   { rest: [0.85, -0.18, -0.3], slashDur: 0.6, slashCd: 0.66, slashDmg: 5.5, range: 2.9, cone: 0.95, max: 2, back: 2, stun: 1.0, armor: 1.5, knock: 7, sweep: 4.5, heavy: 'smash', heavyDur: 0.9, heavyCd: 1.1, heavyDmg: 9, heavyStun: 2.2 },
@@ -5034,11 +5038,11 @@ function meleeHit(sw) {
     groundShock(M.spinR * 0.7); if (n) { sndStab(); shake = Math.max(shake, 0.08); }
     return;
   }
-  if (sw.mode === 'smash' && sw.w === 'odachi') { // 대태도 내려베기: 앞쪽 일직선을 길게 가름
+  if (sw.mode === 'smash' && (sw.w === 'odachi' || sw.w === 'knife')) { // 대태도·장검 내려베기: 앞쪽 일직선을 길게 가름
     const n = meleeArea({ range: M.heavyRange, cone: M.heavyCone, max: M.heavyMax, dmg: M.heavyDmg, back: M.back, armor: M.armor, stun: 0.5, knock: 9 });
     const fx = -Math.sin(yaw), fz = -Math.cos(yaw), a = new V3(player.x + fx * 0.8, player.y + 0.08, player.z + fz * 0.8), b = new V3(player.x + fx * M.heavyRange, player.y + 0.08, player.z + fz * M.heavyRange);
     fxLine(a, b, 0xffd0c0, 0.05, 0.35); groundShock(1.6, true);
-    if (n) { sndStab(); sndSmash(); shake = Math.max(shake, 0.25); if (n >= 2) toast(`일도양단 ${n}명`); } else { shake = Math.max(shake, 0.12); meleeWallHit(); }
+    if (n) { sndStab(); sndSmash(); shake = Math.max(shake, 0.25); if (n >= 2 && sw.w === 'odachi') toast(`일도양단 ${n}명`); } else { shake = Math.max(shake, 0.12); meleeWallHit(); }
     return;
   }
   if (sw.mode === 'smash') {
@@ -6080,6 +6084,7 @@ function poseViewModel(sp, bob, dt) {
       vm.wrist.rotation.set(Math.sin(time * 1.3) * 0.02, 0, 0);
       pos.y += Math.sin(time * 2.2) * 0.003;
     }
+    if (vm.lh) vm.lh.visible = !!(swing && swing.heavy && swing.w === 'knife' && swing.mode === 'smash'); // 장검 내려베기: 두 손으로
     if (vm.L) { // 쌍검 왼손: 오른손 자세를 좌우 반전해 따라감 (2연타의 뒤 절반은 왼손이 따로 벰)
       const L = vm.L;
       if (swing && swing.mode === 'double') {
