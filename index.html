@@ -58,6 +58,10 @@ body { background: var(--void); color: var(--ink); font-family: var(--body); ove
 #cross .l { right: var(--gap); } #cross .r { left: var(--gap); }
 #cross .dot { width: 2px; height: 2px; left: -1px; top: -1px; }
 #cross.steady { --c: var(--cyan); }
+#lscope { position: absolute; inset: 0; pointer-events: none; opacity: 0; --R: min(44vw, 44vh); background: radial-gradient(circle at 50% 50%, transparent 0 calc(var(--R) - 26px), rgba(4,6,10,.28) calc(var(--R) - 6px), rgba(10,12,16,.9) calc(var(--R) - 2px), rgba(10,12,16,.9) calc(var(--R) + 3px), rgba(0,0,0,.42) calc(var(--R) + 5px)); }
+#lscope i { position: absolute; left: 50%; top: 50%; background: rgba(12,14,18,.85); }
+#lscope .h { width: calc(var(--R) * 2); height: 1.5px; transform: translate(-50%, -50%); -webkit-mask: linear-gradient(90deg, #000 0 42%, transparent 42% 58%, #000 58%); mask: linear-gradient(90deg, #000 0 42%, transparent 42% 58%, #000 58%); }
+#lscope .v { width: 1.5px; height: calc(var(--R) * 2); transform: translate(-50%, -50%); -webkit-mask: linear-gradient(180deg, #000 0 42%, transparent 42% 58%, #000 58%); mask: linear-gradient(180deg, #000 0 42%, transparent 42% 58%, #000 58%); }
 #rdot { position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; background: #ff3a2a; box-shadow: 0 0 6px 2px rgba(255,58,42,.7); opacity: 0; }
 #steady { position: absolute; left: 50%; top: calc(50% + 34px); transform: translateX(-50%); font-family: var(--display); font-size: 11px; letter-spacing: .16em; color: var(--cyan); opacity: 0; transition: opacity .1s; }
 #steady.on { opacity: 1; }
@@ -321,6 +325,7 @@ body.touch .keys, body.touch .legend { display: none; }
       <div class="info" id="scopeInfo"></div>
     </div>
     <div id="cross"><i class="u"></i><i class="d"></i><i class="l"></i><i class="r"></i><i class="dot"></i></div>
+    <div id="lscope"><i class="h"></i><i class="v"></i></div>
     <div id="rdot"></div>
     <div id="steady">정조준</div>
     <div id="hitmark"></div>
@@ -3375,7 +3380,9 @@ function buildKB(name, o) {
   }
   if (o.scope) { const sc = o.scope, g = new THREE.Group(); g.scale.setScalar(s * (sc.s || 1)); g.position.copy(T(sc.y, sc.z, x0 - 0.005 * (sc.s || 1))); gun.add(g);
     for (const p of kbParts(sc.n)) g.add(new THREE.Mesh(p.geo, KB_MAT)); }
-  for (const a of o.qacc || []) { const g = new THREE.Group(); g.scale.setScalar(s * a.s); g.position.copy(T(a.y, a.z)); gun.add(g); g.add(new THREE.Mesh(qGeo(a.n, a.acc || 'purple'), QN_MAT)); }
+  let fadeM = null; // 조준할 때 서서히 투명해지는 부착물(조준경) — 눈앞을 가리지 않게
+  for (const a of o.qacc || []) { const g = new THREE.Group(); g.scale.setScalar(s * a.s); g.position.copy(T(a.y, a.z)); gun.add(g);
+    const mm = a.fade ? (fadeM = QN_MAT.clone(), fadeM.transparent = true, fadeM.__keep = true, fadeM) : QN_MAT; g.add(new THREE.Mesh(qGeo(a.n, a.acc || 'purple'), mm)); }
   // 왼손 자리: 총구와 손잡이 사이, 그 위치의 몸체 바닥 높이를 모델에서 직접 찾음
   const lhZ = o.lhZ != null ? o.lhZ : o.grip[1] + (o.mz[1] - o.grip[1]) * 0.62;
   let lhY = Infinity; if (o.lh) lhY = o.lh[0]; else { const P = main.geo.attributes.position.array; for (let i = 0; i < P.length; i += 3) if (Math.abs(P[i + 2] - lhZ) < 0.03 && Math.abs(P[i] - x0) < 0.06) lhY = Math.min(lhY, P[i + 1]); }
@@ -3397,7 +3404,7 @@ function buildKB(name, o) {
   const bolt = new THREE.Group(); if (slideGeo) { const sg = new THREE.Group(); sg.scale.setScalar(s); sg.position.copy(T(0, 0, 0)); bolt.add(sg); sg.add(new THREE.Mesh(slideGeo, MAT)); } else { const bp = o.bolt || [o.top - 0.04, o.grip[1] - 0.08]; bolt.position.copy(T(bp[0], bp[1])); bolt.position.x = (o.boltX != null ? o.boltX : main.geo.boundingBox.max.x - x0) * s; } gun.add(bolt);
   if (o.boltKnob) { gp(BX(0.026, 0.012, 0.012), KB_DARK, 0.011, 0, 0, bolt); gp(BX(0.016, 0.016, 0.02), KB_DARK, 0.026, 0, 0, bolt); }
   const top = T(o.top, 0).y;
-  return { g: gun, mag, magRest, bolt, pump: o.pump ? fore : null, muzzle, flash: muzzleFlash(gun, muzzle, o.flash || 1), port: new V3(0.05, top - 0.03, T(0, o.grip[1] - 0.12).z), opticY: top, spinG, kenney: true, T, adsZ: o.adsZ || 0 };
+  return { g: gun, mag, magRest, bolt, pump: o.pump ? fore : null, muzzle, flash: muzzleFlash(gun, muzzle, o.flash || 1), port: new V3(0.05, top - 0.03, T(0, o.grip[1] - 0.12).z), opticY: top, spinG, kenney: true, T, adsZ: o.adsZ || 0, fadeM };
 }
 function buildKBCrossbow() {
   const v = buildKB('blaster-n', { s: 0.62, grip: [-0.084, 0.084], mz: [0.073, -0.32], top: 0.215, flash: 0.01, qacc: [{ n: 'Scope_2', y: 0.13, z: 0.02, s: 0.155 }] });
@@ -3409,7 +3416,7 @@ function buildKBCrossbow() {
 }
 VM_BUILD = true;
 const VM = {
-  rifle: buildKB('AssaultRifle2_1', { q: 'purple', s: 0.19, grip: [0.02, 0.02], mz: [0.65, -3.6], top: 1.0, magBox: [-1.25, -0.6, 0.35], lh: [0.5, -1.9] }),
+  rifle: buildKB('AssaultRifle2_1', { q: 'purple', s: 0.19, grip: [0.02, 0.02], mz: [0.65, -3.6], top: 1.2, magBox: [-1.25, -0.6, 0.35], lh: [0.5, -1.9], qacc: [{ n: 'Scope_2', y: 0.95, z: -0.45, s: 0.85, fade: true }] }),
   smg: buildKB('SubmachineGun_1', { q: 'yellow', s: 0.155, grip: [0.0, 0.05], mz: [0.63, -2.25], top: 1.35, adsZ: 0.05, flash: 0.8, magBox: [-1.15, -0.65, 0.3], lh: [0.5, -1.5] }),
   shotgun: buildKB('Shotgun_1', { q: 'orange', s: 0.19, grip: [-0.1, 0.0], mz: [0.2, -3.8], top: 0.42, flash: 1.6, pump: true, pumpBox: [-2.8, -1.7, -0.15, 0.18], lh: [-0.12, -2.2] }),
   dmr: buildKB('Bullpup_2', { q: 'purple', s: 0.17, grip: [0.0, 0.05], mz: [0.8, -2.7], top: 1.21, flash: 1.2, magBox: [0.4, 0.95, 0.6], lh: [0.2, -1.05], scope: { n: 'scope-small', y: 1.05, z: -0.9, s: 2.9 } }),
@@ -3551,7 +3558,7 @@ const zoomFov = z => THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathU
 const ads = (k, z = -0.24) => new V3(0, -VM[k].opticY, z - (VM[k].adsZ || 0));
 // sHip/sAds: 기본 퍼짐, sMove/sMoveAds: 이동 시 추가 퍼짐 (라디안)
 const WEAPONS = {
-  rifle:   { name: '소총', kind: 'gun', fall: [30, 65, 0.75], price: 0, mag: 30, dmg: 1.6, rate: 0.11, reload: 1.15, zoom: 1.25, scope: false, speed: 1.0, auto: true, kick: 0.006, recoil: 1,
+  rifle:   { name: '소총', kind: 'gun', fall: [30, 65, 0.75], price: 0, mag: 30, dmg: 1.6, rate: 0.11, reload: 1.15, zoom: 1.25, scope: false, liteScope: true, speed: 1.0, auto: true, kick: 0.006, recoil: 1,
              sHip: 0.005, sAds: 0.0008, sMove: 0.07, sMoveAds: 0.09, bloom: 0.004, bloomMax: 0.03, snd: 'rifle', hip: new V3(0.2, -0.205, -0.4), ads: ads('rifle'),
              desc: '기본 지급 돌격소총. 1.25배율 도트 조준경 (조준해도 시야가 거의 그대로).', specs: ['피해 1.6', '탄창 30발', '1.25배율', '만능형'] },
   smg:     { name: '기관단총', kind: 'gun', fall: [12, 32, 0.55], price: 10, mag: 32, dmg: 1.15, rate: 0.065, reload: 1.0, zoom: 1.5, scope: false, speed: 1.1, auto: true, kick: 0.004, recoil: 0.7,
@@ -6212,6 +6219,7 @@ function poseViewModel(sp, bob, dt) {
       rz += tilt * 0.55; rx += tilt * 0.18; pos.y -= tilt * 0.06; pos.x -= tilt * 0.03;
       if (current === 'shotgun') { rz -= tilt * 0.9; rx -= tilt * 0.1; pos.x += tilt * 0.05; }
     }
+    if (vm.fadeM) { const op = 1 - clamp((zoomAmt - 0.45) / 0.4, 0, 1); vm.fadeM.opacity = op; vm.fadeM.visible = op > 0.02; vm.fadeM.depthWrite = op > 0.98; }
     if (vm.xb) { poseXbow(vm, rt); const ch = player.xCharge || 0; pos.z += ch * 0.035; if (ch >= 1) { pos.x += Math.sin(time * 70) * 0.0012; pos.y += Math.cos(time * 63) * 0.0012; } }
     if (vm.mag) {
       const out = 0.25;
@@ -6698,11 +6706,12 @@ function hud(f, s) {
   crossEl.classList.toggle('steady', steady && W.kind === 'gun');
   setHid(crossEl, aimed && W.kind === 'gun');
   setS($('rdot'), 'opacity', W.kind === 'gun' && !W.scope ? clamp((zoomAmt - 0.6) / 0.3, 0, 1) : 0);
+  setS($('lscope'), 'opacity', W.liteScope ? clamp((zoomAmt - 0.6) / 0.3, 0, 1) : 0); // 소총: 가벼운 조준경 테두리 (1.25배)
   $('steady').classList.toggle('on', W.kind === 'gun' && steady && !aimed && (f || s || p.braking > 0));
   const scopeEl = $('scope');
   setS(scopeEl, 'opacity', W.scope ? Math.max(0, (zoomAmt - 0.6) / 0.4) : 0);
   scopeEl.classList.toggle('steady', steady);
-  VM[current].g.visible = !scoped;
+  VM[current].g.visible = !scoped && !(W.liteScope && zoomAmt > 0.9);
   if (scoped) {
     ray.setFromCamera(new THREE.Vector2(0, 0), camera); ray.far = 260;
     const h = ray.intersectObjects(targetsList(), false)[0];
@@ -6953,7 +6962,7 @@ function start() {
 function setPause(on) {
   if (on) {
     state = 'pause'; setMusicVolume(); unlockKeys(); $('pause').hidden = false; mouseDown = false; zooming = false; zoomAmt = 0; hideSonar();
-    setS($('scope'), 'opacity', 0); $('cross').hidden = false; setS($('rdot'), 'opacity', 0);
+    setS($('scope'), 'opacity', 0); $('cross').hidden = false; setS($('rdot'), 'opacity', 0); setS($('lscope'), 'opacity', 0);
     camera.fov = BASE_FOV; camera.updateProjectionMatrix(); if (locked) document.exitPointerLock();
   } else { const fsFirst = wantFS(); lockGrace = performance.now() + 1500; state = 'play'; lockKeys(); setMusicVolume(); $('pause').hidden = true; last = performance.now(); if (lockSupported && !fsFirst) requestLock(); }
 }
@@ -6974,7 +6983,7 @@ function gameOver() {
   if (locked) document.exitPointerLock();
   // 사망 연출: 시점이 옆으로 쓰러지며 바닥으로 내려가고, 화면이 흑백·붉게 바램 → 사망 화면
   if (deadeye) endDeadeye(); slowT = 0; if (player) player.cloakT = 0; ['slowfx', 'cloakfx', 'deadfx'].forEach(id => $(id).classList.remove('on'));
-  for (const k in VM) VM[k].g.visible = false; ['pause', 'shop', 'lvup', 'settings'].forEach(id => $(id).hidden = true); setS($('scope'), 'opacity', 0); setS($('rdot'), 'opacity', 0);
+  for (const k in VM) VM[k].g.visible = false; ['pause', 'shop', 'lvup', 'settings'].forEach(id => $(id).hidden = true); setS($('scope'), 'opacity', 0); setS($('rdot'), 'opacity', 0); setS($('lscope'), 'opacity', 0);
   deathCam = { t: 0, y0: camera.position.y, gy: player.y + 0.32, roll: Math.random() < 0.5 ? -1 : 1, p0: pitch };
   document.body.classList.add('dead'); sndDeath();
   $('fcause').textContent = lastHitBy ? `${lastHitBy}에게 쓰러졌습니다 · 웨이브 ${wave}` : `웨이브 ${wave}에서 쓰러졌습니다`;
