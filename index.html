@@ -3341,12 +3341,18 @@ const QN_BIN = (() => { const s = atob(QN.bin), u = new Uint8Array(s.length); fo
 const QN_MAT = (() => { const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.46, metalness: 0.06 }); m.userData.kenney = true; return m; })();
 const QN_ACC = { purple: 0x9b6cf0, yellow: 0xffbb38, orange: 0xf46a3c, green: 0x3fcf8e };
 const QN_GEO = {};
+// 실총 느낌 팔레트 (역할별 색 덮어쓰기): 1 주색 · 2 밝은 금속 · 3 어두운 금속 · 4 검정 · 6 렌즈
+const QN_PAL = {
+  sniperDark: { 1: 0x4a5136, 2: 0x6a6e70, 3: 0x2e3135, 4: 0x18191c, 6: 0x1f3d48 },   // 올리브 드랩 개머리판 + 건메탈
+  amrDark:    { 1: 0x5c5242, 2: 0x4e5258, 3: 0x2a2d31, 4: 0x161719, 6: 0x1f3d48 },   // 짙은 사막색 개머리판 + 흑색 금속
+};
 function qGeo(name, acc) {
   const key = name + '|' + acc; if (QN_GEO[key]) return QN_GEO[key];
   const e = QN.meta[name], bb = e.bb, nv = e.nv, q = new Int16Array(QN_BIN, e.o, nv * 3), P = new Float32Array(nv * 3);
   for (let i = 0; i < nv * 3; i++) { const a = i % 3, c = (bb[a] + bb[a + 3]) / 2, h = Math.max(1e-6, (bb[a + 3] - bb[a]) / 2); P[i] = c + q[i] / 32767 * h; }
-  const R = new Uint8Array(QN_BIN, e.o + nv * 9, nv), A = new THREE.Color(QN_ACC[acc] || acc);
+  const PO = QN_PAL[acc], R = new Uint8Array(QN_BIN, e.o + nv * 9, nv), A = new THREE.Color(PO ? PO[1] : QN_ACC[acc] || acc);
   const ROLE = [new THREE.Color(0x8a8a98), A, new THREE.Color(0xd2d4ec), new THREE.Color(0x4c4c5c), new THREE.Color(0x2c2c36), A.clone().multiplyScalar(0.62), new THREE.Color(0x7fe8ff)];
+  if (PO) for (const k in PO) ROLE[k] = new THREE.Color(PO[k]);
   const col = new Float32Array(nv * 3), c = new THREE.Color(), y0 = bb[1], yh = Math.max(1e-6, bb[4] - bb[1]);
   for (let i = 0; i < nv; i++) { c.copy(ROLE[R[i]] || ROLE[0]); if (R[i] !== 6) c.multiplyScalar(0.8 + 0.32 * (P[i * 3 + 1] - y0) / yh); c.convertSRGBToLinear(); col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b; }
   const geo = new THREE.BufferGeometry();
@@ -3421,12 +3427,12 @@ const VM = {
   shotgun: buildKB('Shotgun_1', { q: 'orange', s: 0.19, grip: [-0.1, 0.0], mz: [0.2, -3.8], top: 0.42, flash: 1.6, pump: true, pumpBox: [-2.8, -1.7, -0.15, 0.18], lh: [-0.12, -2.2] }),
   dmr: buildKB('Bullpup_2', { q: 'purple', s: 0.17, grip: [0.0, 0.05], mz: [0.8, -2.7], top: 1.21, flash: 1.2, magBox: [0.4, 0.95, 0.6], lh: [0.2, -1.05], scope: { n: 'scope-small', y: 1.05, z: -0.9, s: 2.9 } }),
   lmg: buildKB('blaster-p', { s: 0.62, grip: [-0.048, 0.24], mz: [0.035, -0.431], top: 0.27, adsZ: 0.07, flash: 1.4, spin: { z: -0.3, y: 0.036 }, qacc: [{ n: 'Bipod', y: -0.03, z: -0.36, s: 0.24 }] }),
-  sniper: buildKB('SniperRifle_1', { q: 'yellow', s: 0.15, grip: [-0.15, -0.4], mz: [0.28, -5.25], top: 0.6, flash: 1.3, lh: [0.12, -2.4], boltKnob: true, bolt: [0.3, -0.7], boltX: 0.16 }),
+  sniper: buildKB('SniperRifle_1', { q: 'sniperDark', s: 0.15, grip: [-0.15, -0.4], mz: [0.28, -5.25], top: 0.6, flash: 1.3, lh: [0.12, -2.4], boltKnob: true, bolt: [0.3, -0.7], boltX: 0.16 }),
   pistol: buildKB('Pistol_4', { q: 'orange', s: 0.11, grip: [0.05, 0.0], mz: [0.95, -1.55], top: 1.08, flash: 0.75, pistol: true, slideY: 0.78 }),
   battle: buildKB('AssaultRifle_4', { q: 'yellow', s: 0.19, grip: [0.05, 0.0], mz: [0.6, -3.8], top: 0.98, flash: 1.25, magBox: [-1.7, -0.75, 0.38], lh: [0.35, -2.0], scope: { n: 'scope-small', y: 0.82, z: -0.75, s: 2.9 } }),
   autosg: buildKB('blaster-l', { s: 0.6, grip: [-0.072, 0.204], mz: [0.04, -0.275], top: 0.17, flash: 1.5, wide: 0.02, lh: [-0.13, -0.14], qacc: [{ n: 'Grip', y: -0.1, z: -0.14, s: 0.17 }] }),
   revolver: buildKB('Revolver_2', { q: 'yellow', s: 0.18, grip: [0.05, -0.02], mz: [0.6, -1.75], top: 0.66, flash: 1.0, pistol: true, spin: { f: (x, y, z) => z >= -0.8 && z <= -0.38 && y >= 0.2 && y <= 0.66, y: 0.43 } }),
-  amr: buildKB('SniperRifle_5', { q: 'green', s: 0.17, grip: [0.0, 0.9], mz: [0.58, -3.98], top: 0.85, flash: 1.6, lh: [0.45, -1.4], boltKnob: true, bolt: [0.55, 0.3], boltX: 0.16 }),
+  amr: buildKB('SniperRifle_5', { q: 'amrDark', s: 0.17, grip: [0.0, 0.9], mz: [0.58, -3.98], top: 0.85, flash: 1.6, lh: [0.45, -1.4], boltKnob: true, bolt: [0.55, 0.3], boltX: 0.16 }),
   marksman: buildKBCrossbow(),
   launcher: buildKB('blaster-o', { s: 0.62, grip: [-0.07, 0.13], mz: [0.0, -0.195], top: 0.25, adsZ: 0.07, flash: 1.5, wide: 0.02, lh: [-0.27, -0.08], qacc: [{ n: 'Grip', y: -0.22, z: -0.08, s: 0.17 }] }),
   knife: buildKnife(),
