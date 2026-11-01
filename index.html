@@ -6589,7 +6589,8 @@ function updateEnemies(dt) {
     const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), m = a.r + b.r;
     if (d > 0 && d < m) { const push = (m - d) / 2 / d; a.x -= dx * push; a.z -= dz * push; b.x += dx * push; b.z += dz * push; }
   }
-  const dead = enemies.filter(e => e.hp <= 0); dead.forEach(kill);
+  // 처치 처리: 드론 폭발 등으로 처치 도중 다른 적이 연쇄로 죽어도 모두 처리해서 화면에 잔상이 남지 않게 함
+  for (let guard = 0; guard < 20; guard++) { const dead = enemies.filter(e => e.hp <= 0 && !e.killed); if (!dead.length) break; for (const e of dead) { e.killed = true; kill(e); } }
   enemies = enemies.filter(e => e.hp > 0);
 }
 
