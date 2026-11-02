@@ -6013,7 +6013,7 @@ const WEAPONS = {
   pistol:  { name: '권총', kind: 'gun', fall: [10, 30, 0.5], price: 0, mag: 7, dmg: 2.2, rate: 0.16, reload: 1.25, zoom: 1.25, scope: false, speed: 1.12, auto: false, kick: 0.016, recoil: 0.9,
              sHip: 0.012, sAds: 0.0025, sMove: 0.035, sMoveAds: 0.045, snd: 'pistol', hip: new V3(0.17, -0.17, -0.36), ads: ads('pistol', -0.34),
              desc: '기본 지급 권총. 7발, 반자동. 가볍고 꺼내기 빠릅니다.' },
-  sniper:  { name: '저격총', kind: 'gun', fall: [60, 120, 0.85], price: 10, mag: 5, dmg: 14, rate: 1.25, reload: 2.4, zoom: 4, scope: true, speed: 0.95, auto: false, kick: 0.035, recoil: 1.6, action: 'bolt', actionTime: 1.0,
+  sniper:  { name: '저격총', kind: 'gun', price: 10, mag: 5, dmg: 14, rate: 1.25, reload: 2.4, zoom: 4, scope: true, speed: 0.95, auto: false, kick: 0.035, recoil: 1.6, action: 'bolt', actionTime: 1.0,
              sHip: 0.05, sAds: 0, sMove: 0.08, sMoveAds: 0.12, snd: 'sniper', hip: new V3(0.2, -0.2, -0.42), ads: new V3(0, -0.085, -0.22),
              desc: '볼트액션. 멈춘 상태로 조준하면 탄이 전혀 퍼지지 않습니다.', specs: ['피해 14 (약점 28)', '탄창 5발', '4배율'] },
   knife:   { name: '장검', kind: 'melee', price: 0, speed: 1.05, hip: KNIFE_SHOULDER,
@@ -7350,7 +7350,7 @@ const tracerMat = new THREE.LineBasicMaterial({ color: 0xffd08a, transparent: tr
 function targetsList() { const t = solids.slice(); for (const e of enemies) t.push(...e.hits); return t; }
 function damage(e, amt) { if (e.boss) amt *= 0.75; e.hp -= amt; if (e.cloak) e.reveal = 2; e.lastSrc = SRC || '폭발'; e.lastCrit = false; e.flash = 0.07; e.flashCrit = false; e.flinch = Math.min(1, e.flinch + 0.5); }
 
-// 거리별 피해 감소: fall = [이 거리까지 100%, 이 거리부터 최소, 최소 배율]. 모든 총에 적용 (석궁은 화살이 떨어지고, 유탄은 폭발이라 제외)
+// 거리별 피해 감소: fall = [이 거리까지 100%, 이 거리부터 최소, 최소 배율]. 저격총은 없음 (석궁은 화살이 떨어지고, 유탄은 폭발이라 제외)
 // 무기 설명에 거리별 피해 감소를 자동으로 적어 넣음
 for (const k in WEAPONS) { const W = WEAPONS[k]; if (!W.fall || !W.specs) continue; const [a, b, m] = W.fall;
   W.specs = W.specs.map(t => t.replace(/ ?\(?\d+m부터 약해짐\)?/, '')).filter(t => t && !/^\d+m부터/.test(t));
