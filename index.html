@@ -5977,43 +5977,43 @@ const zoomFov = z => THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathU
 const ads = (k, z = -0.24) => new V3(0, -VM[k].opticY, z - (VM[k].adsZ || 0));
 // sHip/sAds: 기본 퍼짐, sMove/sMoveAds: 이동 시 추가 퍼짐 (라디안)
 const WEAPONS = {
-  rifle:   { name: '소총', kind: 'gun', fall: [30, 65, 0.75], price: 0, mag: 30, dmg: 1.6, rate: 0.11, reload: 1.15, zoom: 1.25, scope: false, liteScope: true, speed: 1.0, auto: true, kick: 0.006, recoil: 1,
+  rifle:   { name: '소총', kind: 'gun', fall: [20, 50, 0.65], price: 0, mag: 30, dmg: 1.6, rate: 0.11, reload: 1.15, zoom: 1.25, scope: false, liteScope: true, speed: 1.0, auto: true, kick: 0.006, recoil: 1,
              sHip: 0.005, sAds: 0.0008, sMove: 0.07, sMoveAds: 0.09, bloom: 0.004, bloomMax: 0.03, snd: 'rifle', hip: new V3(0.2, -0.205, -0.4), ads: ads('rifle'),
              desc: '기본 지급 돌격소총. 1.25배율 도트 조준경 (조준해도 시야가 거의 그대로).', specs: ['피해 1.6', '탄창 30발', '1.25배율', '만능형'] },
-  smg:     { name: '기관단총', kind: 'gun', fall: [12, 32, 0.55], price: 10, mag: 32, dmg: 1.15, rate: 0.065, reload: 1.0, zoom: 1.5, scope: false, speed: 1.1, auto: true, kick: 0.004, recoil: 0.7,
+  smg:     { name: '기관단총', kind: 'gun', fall: [10, 28, 0.45], price: 10, mag: 32, dmg: 1.15, rate: 0.065, reload: 1.0, zoom: 1.5, scope: false, speed: 1.1, auto: true, kick: 0.004, recoil: 0.7,
              sHip: 0.009, sAds: 0.003, sMove: 0.03, sMoveAds: 0.04, bloom: 0.003, bloomMax: 0.025, snd: 'smg', hip: new V3(0.19, -0.2, -0.36), ads: ads('smg', -0.26),
              desc: '연사가 매우 빠르고 이동 중에도 잘 맞습니다. 근거리용.', specs: ['피해 1.15', '탄창 32발', '근거리 특화 (12m부터 약해짐)', '이동 속도 +10%'] },
-  shotgun: { name: '산탄총', kind: 'gun', fall: [7, 22, 0.35], price: 10, mag: 6, dmg: 1.3, pellets: 9, rate: 0.9, reload: 2.2, zoom: 1.3, scope: false, speed: 1.0, auto: false, kick: 0.035, recoil: 1.8, action: 'pump', actionTime: 0.62,
+  shotgun: { name: '산탄총', kind: 'gun', fall: [5, 18, 0.25], price: 10, mag: 6, dmg: 1.3, pellets: 9, rate: 0.9, reload: 2.2, zoom: 1.3, scope: false, speed: 1.0, auto: false, kick: 0.035, recoil: 1.8, action: 'pump', actionTime: 0.62,
              sHip: 0.075, sAds: 0.055, sMove: 0.02, sMoveAds: 0.02, snd: 'shotgun', hip: new V3(0.2, -0.2, -0.38), ads: ads('shotgun', -0.28),
              desc: '펌프액션. 한 번에 9발의 산탄이 퍼집니다. 가까이서 쏘면 한 방에 쓰러뜨립니다.', specs: ['피해 1.3×9', '탄창 6발', '펌프액션', '7m부터 약해짐'] },
-  dmr:     { name: '지정사수소총', kind: 'gun', price: 10, mag: 12, dmg: 4.8, rate: 0.33, reload: 1.6, zoom: 3, scope: true, speed: 0.95, auto: false, kick: 0.02, recoil: 1.3,
+  dmr:     { name: '지정사수소총', kind: 'gun', fall: [40, 85, 0.8], price: 10, mag: 12, dmg: 4.8, rate: 0.33, reload: 1.6, zoom: 3, scope: true, speed: 0.95, auto: false, kick: 0.02, recoil: 1.3,
              sHip: 0.02, sAds: 0.0003, sMove: 0.08, sMoveAds: 0.1, snd: 'dmr', hip: new V3(0.2, -0.205, -0.4), ads: ads('dmr'),
              desc: '반자동 정밀 소총. 3배율 조준경으로 중거리 헤드샷에 강합니다.', specs: ['피해 4.8 (약점 9.6)', '탄창 12발', '3배율', '거리 감소 없음'] },
-  lmg:     { name: '회전 기관포', kind: 'gun', fall: [28, 60, 0.75], price: 10, mag: 150, dmg: 1.2, rate: 0.12, reload: 4.0, zoom: 1.4, scope: false, speed: 0.92, auto: true, kick: 0.005, recoil: 1.0, rotary: true,
+  lmg:     { name: '회전 기관포', kind: 'gun', fall: [20, 50, 0.6], price: 10, mag: 150, dmg: 1.2, rate: 0.12, reload: 4.0, zoom: 1.4, scope: false, speed: 0.92, auto: true, kick: 0.005, recoil: 1.0, rotary: true,
              sHip: 0.013, sAds: 0.004, sMove: 0.09, sMoveAds: 0.11, bloom: 0.005, bloomMax: 0.04, snd: 'lmg', hip: new V3(0.2, -0.21, -0.42), ads: ads('lmg', -0.26),
              desc: '6개의 총열이 돌며 쏘는 기관포. 누르고 있으면 총열이 돌기 시작해 점점 빨라지고(최대 초당 24발), 우클릭으로 미리 돌려 둘 수 있습니다. 앉으면 거치해서 반동·탄 퍼짐이 크게 줄어듭니다. 도는 동안은 걸음이 느려집니다.', specs: ['피해 1.2', '탄띠 150발', '연사 8→24발/초', '앉으면 거치 사격'] },
-  battle:  { name: '전투소총', kind: 'gun', fall: [40, 75, 0.85], price: 10, mag: 21, dmg: 2.9, rate: 0.36, burst: 3, burstGap: 0.075, reload: 1.6, zoom: 2.5, scope: true, speed: 0.95, auto: false, kick: 0.009, recoil: 1.15,
+  battle:  { name: '전투소총', kind: 'gun', fall: [30, 65, 0.75], price: 10, mag: 21, dmg: 2.9, rate: 0.36, burst: 3, burstGap: 0.075, reload: 1.6, zoom: 2.5, scope: true, speed: 0.95, auto: false, kick: 0.009, recoil: 1.15,
              sHip: 0.008, sAds: 0.0008, sMove: 0.075, sMoveAds: 0.09, bloom: 0.003, bloomMax: 0.02, snd: 'battle', hip: new V3(0.2, -0.205, -0.4), ads: ads('battle'),
              desc: '한 번 클릭에 3발씩 나가는 점사 소총. 2.5배율 조준경, 한 발이 묵직합니다.', specs: ['피해 2.9 ×3점사', '탄창 21발', '2.5배율', '먼 거리도 강함'] },
-  autosg:  { name: '전격 산탄총', kind: 'gun', fall: [6, 18, 0.3], price: 10, mag: 10, dmg: 0.6, pellets: 8, rate: 0.28, reload: 2.3, zoom: 1.3, scope: false, speed: 0.98, auto: true, kick: 0.02, recoil: 1.4, shock: true,
+  autosg:  { name: '전격 산탄총', kind: 'gun', fall: [5, 15, 0.25], price: 10, mag: 10, dmg: 0.6, pellets: 8, rate: 0.28, reload: 2.3, zoom: 1.3, scope: false, speed: 0.98, auto: true, kick: 0.02, recoil: 1.4, shock: true,
              sHip: 0.085, sAds: 0.065, sMove: 0.02, sMoveAds: 0.02, snd: 'autosg', hip: new V3(0.2, -0.2, -0.38), ads: ads('autosg', -0.28),
              desc: '전기를 실어 쏘는 자동 산탄총. 맞은 적에게서 근처 적 2명에게 번개가 튀어 피해를 주고, 맞은 적은 잠깐 감전돼 멈춥니다. 몰려오는 적을 끊어 내는 데 강합니다.', specs: ['피해 0.6×8', '번개 연쇄 2명', '감전 0.35초', '탄창 10발'] },
-  revolver:{ name: '리볼버', kind: 'gun', fall: [20, 45, 0.7], price: 10, mag: 6, dmg: 5.5, rate: 0.45, reload: 2.4, zoom: 1.4, scope: false, speed: 1.08, auto: false, kick: 0.04, recoil: 1.5,
+  revolver:{ name: '리볼버', kind: 'gun', fall: [15, 40, 0.6], price: 10, mag: 6, dmg: 5.5, rate: 0.45, reload: 2.4, zoom: 1.4, scope: false, speed: 1.08, auto: false, kick: 0.04, recoil: 1.5,
              sHip: 0.01, sAds: 0.0012, sMove: 0.05, sMoveAds: 0.06, snd: 'revolver', hip: new V3(0.17, -0.17, -0.36), ads: ads('revolver', -0.34),
              desc: '4번 보조무기 칸에 들어가는 6연발 대구경 리볼버. 한 발 피해가 크고 반동도 큽니다. 머리를 맞히면 11. 리볼버로 맞히면 필살기 데드아이(F) 게이지가 찹니다.', specs: ['피해 5.5 (약점 11)', '탄창 6발', '반동 큼'] },
   marksman:{ name: '석궁', kind: 'gun', price: 10, mag: 1, dmg: 18, rate: 0.25, reload: 0.75, zoom: 2.5, scope: true, speed: 1.0, auto: false, kick: 0.012, recoil: 0.6, xbow: true, adsSpeed: 22,
              sHip: 0.02, sAds: 0.001, sMove: 0.04, sMoveAds: 0.02, snd: 'marksman', hip: new V3(0.2, -0.19, -0.38), ads: new V3(0, -0.085, -0.2),
              desc: '누르고 있으면 시위가 팽팽해지고(0.9초), 놓으면 화살이 날아갑니다. 많이 당길수록 화살이 빠르고 세며, 끝까지 당기면 적 2명을 꿰뚫습니다. 화살은 포물선으로 떨어지고 적이나 벽에 꽂힙니다. 소리가 거의 나지 않고 한 발 쏠 때마다 자동으로 다시 장전합니다.', specs: ['피해 5~18 (머리 2배)', '완충 시 2명 관통', '2.5배율', '장전 0.75초'] },
-  amr:     { name: '대물 저격총', kind: 'gun', price: 10, mag: 4, dmg: 22, pierce: 4, rate: 1.6, reload: 3.0, zoom: 6, scope: true, speed: 0.88, auto: false, kick: 0.055, recoil: 2.0, action: 'bolt', actionTime: 1.3,
+  amr:     { name: '대물 저격총', kind: 'gun', fall: [70, 140, 0.9], price: 10, mag: 4, dmg: 22, pierce: 4, rate: 1.6, reload: 3.0, zoom: 6, scope: true, speed: 0.88, auto: false, kick: 0.055, recoil: 2.0, action: 'bolt', actionTime: 1.3,
              sHip: 0.07, sAds: 0, sMove: 0.1, sMoveAds: 0.14, snd: 'amr', hip: new V3(0.2, -0.21, -0.44), ads: new V3(0, -0.095, -0.22),
              desc: '12.7mm 대물 저격총. 탄이 적을 뚫고 지나가 일렬로 선 적 최대 4명까지 맞힙니다. 6배율.', specs: ['피해 22 (약점 44)', '관통 4명', '탄창 4발', '6배율'] },
   launcher:{ name: '유탄발사기', kind: 'gun', price: 10, mag: 3, dmg: 0, launcher: true, rate: 1.25, reload: 3.4, zoom: 1.3, scope: false, speed: 0.9, auto: false, kick: 0.03, recoil: 1.6,
              sHip: 0.01, sAds: 0.004, sMove: 0.03, sMoveAds: 0.03, snd: 'launcher', hip: new V3(0.2, -0.2, -0.38), ads: ads('launcher', -0.28),
              desc: '포물선으로 날아가 닿는 순간 폭발하는 유탄을 쏩니다. 가까이 쏘면 나도 피해를 입습니다.', specs: ['폭발 피해 10', '폭발 범위 4.5m', '탄창 3발', '착탄 즉시 폭발'] },
-  pistol:  { name: '권총', kind: 'gun', fall: [14, 35, 0.6], price: 0, mag: 7, dmg: 2.2, rate: 0.16, reload: 1.25, zoom: 1.25, scope: false, speed: 1.12, auto: false, kick: 0.016, recoil: 0.9,
+  pistol:  { name: '권총', kind: 'gun', fall: [10, 30, 0.5], price: 0, mag: 7, dmg: 2.2, rate: 0.16, reload: 1.25, zoom: 1.25, scope: false, speed: 1.12, auto: false, kick: 0.016, recoil: 0.9,
              sHip: 0.012, sAds: 0.0025, sMove: 0.035, sMoveAds: 0.045, snd: 'pistol', hip: new V3(0.17, -0.17, -0.36), ads: ads('pistol', -0.34),
              desc: '기본 지급 권총. 7발, 반자동. 가볍고 꺼내기 빠릅니다.' },
-  sniper:  { name: '저격총', kind: 'gun', price: 10, mag: 5, dmg: 14, rate: 1.25, reload: 2.4, zoom: 4, scope: true, speed: 0.95, auto: false, kick: 0.035, recoil: 1.6, action: 'bolt', actionTime: 1.0,
+  sniper:  { name: '저격총', kind: 'gun', fall: [60, 120, 0.85], price: 10, mag: 5, dmg: 14, rate: 1.25, reload: 2.4, zoom: 4, scope: true, speed: 0.95, auto: false, kick: 0.035, recoil: 1.6, action: 'bolt', actionTime: 1.0,
              sHip: 0.05, sAds: 0, sMove: 0.08, sMoveAds: 0.12, snd: 'sniper', hip: new V3(0.2, -0.2, -0.42), ads: new V3(0, -0.085, -0.22),
              desc: '볼트액션. 멈춘 상태로 조준하면 탄이 전혀 퍼지지 않습니다.', specs: ['피해 14 (약점 28)', '탄창 5발', '4배율'] },
   knife:   { name: '장검', kind: 'melee', price: 0, speed: 1.05, hip: KNIFE_SHOULDER,
@@ -7350,7 +7350,11 @@ const tracerMat = new THREE.LineBasicMaterial({ color: 0xffd08a, transparent: tr
 function targetsList() { const t = solids.slice(); for (const e of enemies) t.push(...e.hits); return t; }
 function damage(e, amt) { if (e.boss) amt *= 0.75; e.hp -= amt; if (e.cloak) e.reveal = 2; e.lastSrc = SRC || '폭발'; e.lastCrit = false; e.flash = 0.07; e.flashCrit = false; e.flinch = Math.min(1, e.flinch + 0.5); }
 
-// 거리별 피해 감소: fall = [이 거리까지 100%, 이 거리부터 최소, 최소 배율]. 저격총·지정사수소총은 없음
+// 거리별 피해 감소: fall = [이 거리까지 100%, 이 거리부터 최소, 최소 배율]. 모든 총에 적용 (석궁은 화살이 떨어지고, 유탄은 폭발이라 제외)
+// 무기 설명에 거리별 피해 감소를 자동으로 적어 넣음
+for (const k in WEAPONS) { const W = WEAPONS[k]; if (!W.fall || !W.specs) continue; const [a, b, m] = W.fall;
+  W.specs = W.specs.map(t => t.replace(/ ?\(?\d+m부터 약해짐\)?/, '')).filter(t => t && !/^\d+m부터/.test(t));
+  W.specs.push(`${a}m부터 피해 감소 · ${b}m 이상 ${Math.round(m * 100)}%`); }
 function falloff(W, d) { if (!W.fall || !(d > W.fall[0])) return 1; const [a, b, m] = W.fall; return d >= b ? m : 1 - (1 - m) * (d - a) / (b - a); }
 
 // ================= 리메이크 총: 회전 기관포 · 석궁 · 전격 산탄총 =================
