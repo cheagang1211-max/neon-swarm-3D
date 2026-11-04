@@ -6004,7 +6004,7 @@ const WEAPONS = {
   marksman:{ name: '석궁', kind: 'gun', price: 45, mag: 1, dmg: 18, rate: 0.25, reload: 0.75, zoom: 2.5, scope: true, speed: 1.0, auto: false, kick: 0.012, recoil: 0.6, xbow: true, adsSpeed: 22,
              sHip: 0.02, sAds: 0.001, sMove: 0.04, sMoveAds: 0.02, snd: 'marksman', hip: new V3(0.2, -0.19, -0.38), ads: new V3(0, -0.085, -0.2),
              desc: '누르고 있으면 시위가 팽팽해지고(0.9초), 놓으면 화살이 날아갑니다. 많이 당길수록 화살이 빠르고 세며, 끝까지 당기면 적 2명을 꿰뚫습니다. 화살은 포물선으로 떨어지고 적이나 벽에 꽂힙니다. 소리가 거의 나지 않고 한 발 쏠 때마다 자동으로 다시 장전합니다.', specs: ['피해 5~18 (머리 2배)', '완충 시 2명 관통', '2.5배율', '장전 0.75초'] },
-  amr:     { name: '대물 저격총', kind: 'gun', fall: [70, 140, 0.9], price: 120, mag: 4, dmg: 22, pierce: 4, rate: 1.6, reload: 3.0, zoom: 6, scope: true, speed: 0.88, auto: false, kick: 0.055, recoil: 2.0, action: 'bolt', actionTime: 1.3,
+  amr:     { name: '대물 저격총', kind: 'gun', price: 120, mag: 4, dmg: 22, pierce: 4, rate: 1.6, reload: 3.0, zoom: 6, scope: true, speed: 0.88, auto: false, kick: 0.055, recoil: 2.0, action: 'bolt', actionTime: 1.3,
              sHip: 0.07, sAds: 0, sMove: 0.1, sMoveAds: 0.14, snd: 'amr', hip: new V3(0.2, -0.21, -0.44), ads: new V3(0, -0.095, -0.22),
              desc: '12.7mm 대물 저격총. 탄이 적을 뚫고 지나가 일렬로 선 적 최대 4명까지 맞힙니다. 6배율.', specs: ['피해 22 (약점 44)', '관통 4명', '탄창 4발', '6배율'] },
   launcher:{ name: '유탄발사기', kind: 'gun', price: 100, mag: 3, dmg: 0, launcher: true, rate: 1.25, reload: 3.4, zoom: 1.3, scope: false, speed: 0.9, auto: false, kick: 0.03, recoil: 1.6,
@@ -7350,7 +7350,7 @@ const tracerMat = new THREE.LineBasicMaterial({ color: 0xffd08a, transparent: tr
 function targetsList() { const t = solids.slice(); for (const e of enemies) t.push(...e.hits); return t; }
 function damage(e, amt) { if (e.boss) amt *= 0.75; e.hp -= amt; if (e.cloak) e.reveal = 2; e.lastSrc = SRC || '폭발'; e.lastCrit = false; e.flash = 0.07; e.flashCrit = false; e.flinch = Math.min(1, e.flinch + 0.5); }
 
-// 거리별 피해 감소: fall = [이 거리까지 100%, 이 거리부터 최소, 최소 배율]. 저격총은 없음 (석궁은 화살이 떨어지고, 유탄은 폭발이라 제외)
+// 거리별 피해 감소: fall = [이 거리까지 100%, 이 거리부터 최소, 최소 배율]. 저격총·대물 저격총은 없음 (석궁은 화살이 떨어지고, 유탄은 폭발이라 제외)
 // 무기 설명에 거리별 피해 감소를 자동으로 적어 넣음
 for (const k in WEAPONS) { const W = WEAPONS[k]; if (!W.fall || !W.specs) continue; const [a, b, m] = W.fall;
   W.specs = W.specs.map(t => t.replace(/ ?\(?\d+m부터 약해짐\)?/, '')).filter(t => t && !/^\d+m부터/.test(t));
